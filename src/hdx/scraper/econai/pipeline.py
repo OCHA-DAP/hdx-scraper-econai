@@ -1,0 +1,102 @@
+#!/usr/bin/python
+"""EconAI scraper"""
+
+import logging
+from datetime import timezone
+from typing import Optional, Tuple
+
+from hdx.api.configuration import Configuration
+from hdx.api.utilities.date_helper import DateHelper
+from hdx.data.dataset import Dataset
+from hdx.data.resource import Resource
+from hdx.data.showcase import Showcase
+from hdx.utilities.dateparse import get_datetime_from_timestamp, default_enddate, \
+    default_date, parse_date_range
+from hdx.utilities.retriever import Retrieve
+from slugify import slugify
+
+logger = logging.getLogger(__name__)
+
+
+class Pipeline:
+    type_mapping = {"armedconf": "Armed Conflict",
+"anyviolence": "Any Violence",
+"lnbest" : "Violence Intensity"}
+
+    def __init__(self, configuration: Configuration, retriever: Retrieve, tempdir: str):
+        self._configuration = configuration
+        self._retriever = retriever
+        self._tempdir = tempdir
+        self._start_date = default_enddate
+        self._end_date = default_date
+
+    def add_resources(self, dataset: Dataset) -> None:
+        json = self._retriever.download_json(self._configuration["url"])
+        codebook_resource = None
+        for file in json:
+            filename = file["name"]
+            last_modified = get_datetime_from_timestamp(file["updatedOn"], timezone=timezone.utc)
+            created_date = get_datetime_from_timestamp(file["createdOn"], timezone=timezone.utc)
+            created = DateHelper.get_hdx_date(
+                created_date, ignore_timeinfo=False, include_microseconds=True)
+            url = file["publicUrl"]
+            path = self._retriever.download_file(url)
+            if "codebook" in filename:
+                is_codebook = True
+                description = "Codebook"
+            else:
+                is_codebook = False
+                timeframe = int(filename[-6:-4])
+                filetype_short = filename[21:-7]
+                filetype = self.type_mapping[filetype_short]
+                description = f"{filetype} over {timeframe} months"
+            resource = Resource({"name": filename, "description": description, "created": created})
+            resource.set_format(filename[-3:])
+            resource.set_file_to_upload(path)
+            resource.set_date_data_updated(last_modified)
+            if is_codebook:
+                codebook_resource = resource
+                continue
+            dataset.add_update_resource(resource)
+            headers, iterator = self._retriever.downloader.get_tabular_rows(path, dict_form=True)
+            for row in iterator:
+                period = row["period"]
+                start_date, end_date = parse_date_range(f"{period[:4]}-{period[-2:]}")
+                if start_date < self._start_date:
+                    self._start_date = start_date
+                if end_date > self._end_date:
+                    self._end_date = end_date
+        if codebook_resource:
+            dataset.add_update_resource(codebook_resource)
+
+    def generate_dataset_and_showcase(self) -> Tuple[Dataset, Showcase]:
+        # Dataset info
+        title = "EconAI Conflict Forecast"
+        name = slugify(title)
+        dataset = Dataset(
+            {
+                "name": name,
+                "title": title,
+            }
+        )
+
+        tag = "conflict-violence"
+        dataset.add_tag(tag)
+        dataset.set_subnational(False)
+        dataset.add_other_location("world")
+
+        self.add_resources(dataset)
+        dataset.set_time_period(self._start_date, self._end_date)
+
+        showcase = Showcase(
+            {
+                "name": f"{name}-showcase",
+                "title": title,
+                "notes": "Conflict Prevention Gains",
+                "url": "https://conflictforecast.org/prevention-gains",
+                "image_url": "https://raw.githubusercontent.com/mcarans/hdx-scraper-econai/main/gridcells.png",
+            }
+        )
+        showcase.add_tag(tag)
+
+        return dataset, showcase
