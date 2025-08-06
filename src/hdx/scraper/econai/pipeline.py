@@ -30,14 +30,16 @@ class Pipeline:
     }
 
     def __init__(self, configuration: Configuration, retriever: Retrieve, tempdir: str):
-        self._configuration = configuration
+        self._base_url = configuration["base_url"]
+        latest_path = configuration["latest_path"]
+        self._latest_url = f"{self._base_url}{latest_path}"
         self._retriever = retriever
         self._tempdir = tempdir
         self._start_date = default_enddate
         self._end_date = default_date
 
     def add_resources(self, dataset: Dataset) -> datetime:
-        json = self._retriever.download_json(self._configuration["url"])
+        json = self._retriever.download_json(self._latest_url)
         codebook_resource = None
         latest_last_modified = default_date
         for file in json:
@@ -51,8 +53,8 @@ class Pipeline:
             created = DateHelper.get_hdx_date(
                 created_date, ignore_timeinfo=False, include_microseconds=True
             )
-            url = file["publicUrl"]
-            path = self._retriever.download_file(url)
+            url = file["url"]
+            path = self._retriever.download_file(f"{self._base_url}{url}")
             if "codebook" in filename:
                 is_codebook = True
                 description = "Codebook"
@@ -113,7 +115,7 @@ class Pipeline:
                 "title": title,
                 "notes": "Conflict Prevention Gains",
                 "url": "https://conflictforecast.org/prevention-gains",
-                "image_url": "https://raw.githubusercontent.com/mcarans/hdx-scraper-econai/main/gridcells.png",
+                "image_url": "https://raw.githubusercontent.com/mcarans/hdx-scraper-econai/main/gridcells.png",  # FIXME
             }
         )
         showcase.add_tag(tag)

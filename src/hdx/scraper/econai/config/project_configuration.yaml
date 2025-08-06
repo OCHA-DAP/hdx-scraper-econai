@@ -1,3 +1,3 @@
 # Collector specific configuration
-url: "https://backendlessappcontent.com/C177D0DC-B3D5-818C-FF1E-1CC11BC69600/B5AD826E-E563-4105-9ED4-84A360218B15/files/conflictForecast/latest/"
-#url: "https://api.backendless.com/C177D0DC-B3D5-818C-FF1E-1CC11BC69600/C5F2917E-C2F6-4F7D-9063-69555274134E/services/fileService/get-latest-file-listing"
+base_url: "https://api.backendless.com/C177D0DC-B3D5-818C-FF1E-1CC11BC69600/C5F2917E-C2F6-4F7D-9063-69555274134E/files/"
+latest_path: "conflictForecast/latest/"

@@ -72,7 +72,7 @@ def main(
                 dataset, showcase, last_modified = (
                     pipeline.generate_dataset_and_showcase()
                 )
-                if last_modified > state.get():
+                if last_modified <= state.get():
                     return  # no need to update dataset as no change
                 dataset.update_from_yaml(
                     script_dir_plus_file(
