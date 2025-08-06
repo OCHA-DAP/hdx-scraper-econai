@@ -34,8 +34,6 @@ def configuration(config_dir):
     # Change locations below to match those needed in tests
     Locations.set_validlocations(
         [
-            {"name": "afg", "title": "Afghanistan"},
-            {"name": "sdn", "title": "Sudan"},
             {"name": "world", "title": "World"},
         ]
     )
@@ -43,12 +41,7 @@ def configuration(config_dir):
     Vocabulary._approved_vocabulary = {
         "tags": [
             {"name": tag}
-            # Change tags below to match those needed in tests
-            for tag in (
-                "hxl",
-                "humanitarian needs overview - hno",
-                "people in need - pin",
-            )
+            for tag in ("conflict-violence",)
         ],
         "id": "b891512e-9516-4bf5-962a-7a289772a2a1",
         "name": "approved",
