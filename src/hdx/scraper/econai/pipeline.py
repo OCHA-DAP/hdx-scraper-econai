@@ -35,12 +35,12 @@ class Pipeline:
         self._latest_url = f"{self._base_url}{latest_path}"
         self._retriever = retriever
         self._tempdir = tempdir
-        self._start_date = default_enddate
-        self._end_date = default_date
 
     def add_resources(self, dataset: Dataset) -> datetime:
         json = self._retriever.download_json(self._latest_url)
         codebook_resource = None
+        earliest_start_date = default_enddate
+        latest_end_date = default_date
         latest_last_modified = default_date
         for file in json:
             filename = file["name"]
@@ -82,12 +82,13 @@ class Pipeline:
             for row in iterator:
                 period = row["period"]
                 start_date, end_date = parse_date_range(f"{period[:4]}-{period[-2:]}")
-                if start_date < self._start_date:
-                    self._start_date = start_date
-                if end_date > self._end_date:
-                    self._end_date = end_date
+                if start_date < earliest_start_date:
+                    earliest_start_date = start_date
+                if end_date > latest_end_date:
+                    latest_end_date = end_date
         if codebook_resource:
             dataset.add_update_resource(codebook_resource)
+        dataset.set_time_period(earliest_start_date, latest_end_date)
         return latest_last_modified
 
     def generate_dataset_and_showcase(self) -> Tuple[Dataset, Showcase, datetime]:
@@ -107,7 +108,6 @@ class Pipeline:
         dataset.add_other_location("world")
 
         last_modified = self.add_resources(dataset)
-        dataset.set_time_period(self._start_date, self._end_date)
 
         showcase = Showcase(
             {
