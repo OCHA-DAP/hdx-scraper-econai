@@ -1,12 +1,7 @@
 license_id: cc-by
 methodology: Other
 methodology_other: |
-  For more information, see [Dynamic Early Warning and Action Model: A policy evaluation tool](https://conflictforecast.org/prevention-gains). See also:
-
-  - Mueller, Hannes and Christopher Rauh (2022), The Hard Problem of Prediction for Conflict Prevention. Journal of the European Economic Association, Volume 20, Issue 6, December, pp. 2440–246.
-  - Mueller, Hannes and Christopher Rauh (2022), Using Past Violence and Current News to Predict Changes in Violence. International Interactions, Volume 48, Issue 4, pp. 579-596.
-  - Mueller, Hannes and Christopher Rauh (2018), Reading Between the Lines: Prediction of Political Violence Using Newspaper Text. American Political Science Review, Volume 112, Issue 2, May, pp. 358-375.
-  - Mueller, Hannes, Christopher Rauh, and Ben Seimon (2024) Introducing a global dataset on conflict forecasts and news topics. Data & Policy, volume 6, https://doi.org/10.1017/dap.2024.10.
+  For more information, see [the codebook available at ConflictForecast](https://conflictforecast.org/downloads)
 dataset_source: EconAI
 package_creator: HDX Data Systems Team
 private: False

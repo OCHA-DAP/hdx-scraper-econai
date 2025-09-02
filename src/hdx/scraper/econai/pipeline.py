@@ -102,8 +102,8 @@ class Pipeline:
             }
         )
 
-        tag = "conflict-violence"
-        dataset.add_tag(tag)
+        tags = ("conflict-violence", "forecasting")
+        dataset.add_tags(tags)
         dataset.set_subnational(False)
         dataset.add_other_location("world")
 
@@ -115,9 +115,9 @@ class Pipeline:
                 "title": title,
                 "notes": "Conflict Prevention Gains",
                 "url": "https://conflictforecast.org/prevention-gains",
-                "image_url": "https://raw.githubusercontent.com/mcarans/hdx-scraper-econai/main/gridcells.png",  # FIXME
+                "image_url": "https://raw.githubusercontent.com/OCHA-DAP/hdx-scraper-econai/main/gridcells.png",
             }
         )
-        showcase.add_tag(tag)
+        showcase.add_tags(tags)
 
         return dataset, showcase, last_modified
