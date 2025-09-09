@@ -58,6 +58,9 @@ class Pipeline:
             if "codebook" in filename:
                 is_codebook = True
                 description = "Codebook"
+            elif "grid" in filename:
+                is_codebook = False
+                description = "Grid risk"
             else:
                 is_codebook = False
                 timeframe = int(filename[-6:-4])
@@ -80,8 +83,15 @@ class Pipeline:
                 path, dict_form=True
             )
             for row in iterator:
-                period = row["period"]
-                start_date, end_date = parse_date_range(f"{period[:4]}-{period[-2:]}")
+                period = row.get("period")
+                if period:
+                    start_date, end_date = parse_date_range(
+                        f"{period[:4]}-{period[-2:]}"
+                    )
+                else:
+                    year = row["year"]
+                    month = row["month"]
+                    start_date, end_date = parse_date_range(f"{year}-{month}")
                 if start_date < earliest_start_date:
                     earliest_start_date = start_date
                 if end_date > latest_end_date:
